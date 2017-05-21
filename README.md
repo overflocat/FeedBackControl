@@ -188,6 +188,7 @@ pNow是一个`1*20`的矩阵，定义服从论文里的格式，可以参见图�
         [mCenter, mX, mY, mZ] = deal_body_min( body2 ); %SetMainCoordinateSystem
         [center1, vx1, vy1, vz1] = deal_body( body1 ); %vz is ignored
         [center2, vx2, vy2, vz2] = deal_body( body3 ); %vz is ignored
+        center2 = center2 - vz*0.2;%注意，要将采集到目标的位置后移，因为手臂前段还有手爪，这一部分的长度要去除，否则手抓会撞上物体
 
         [coordinate1, ph1, theta1] = deal_tran( mCenter, mX, mY, mZ, center1, vz1 );
         [coordinate2, ph2, theta2] = deal_tran( mCenter, mX, mY, mZ, center2, vz2 ); 
