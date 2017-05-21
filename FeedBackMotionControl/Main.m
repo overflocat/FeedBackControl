@@ -42,7 +42,6 @@ function Main
     end
     motion(:,end)=motion(:,end)*1.2;
 
-
     Pressure( pNow );
     mcs_initialize( );
 

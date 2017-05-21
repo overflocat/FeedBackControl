@@ -39,9 +39,6 @@ function [pNow, K] = ReachMotion( motionGoal, TIMES, pNow, K, ERRORRANGE )
             fprintf('\ndeltaDisY:');
             deltaDisY'
         end
-%         if (deltaX(5))<20&&(deltaY(5))<20
-%             break;
-%         end
         
         errorinX = max ( max( abs(deltaX) ), max( abs(deltaDisX) ) );
         errorinY = max ( max( abs(deltaY) ), max( abs(deltaDisY) ) );
@@ -88,12 +85,6 @@ function [pNow, K] = ReachMotion( motionGoal, TIMES, pNow, K, ERRORRANGE )
         pNow = fix( pNow );
 
         for j = 1:SEGNUM*4
-%             if ( j <= 8 && pNow(j) > 2 * MAXP )
-%                 pNow(j) = 2 * MAXP;
-%             end
-%             if( j > 8 && pNow(j) > MAXP )
-%                 pNow(j) = MAXP;
-%             end
             if( pNow(j) > MAXP )
                 pNow(j) = MAXP;
             end
@@ -106,17 +97,7 @@ function [pNow, K] = ReachMotion( motionGoal, TIMES, pNow, K, ERRORRANGE )
             pNow
         end
 
-        Pressure( pNow );
-        
-        pNow(1) = ( pNow(1) + pNow(5) ) / 2;
-        pNow(2) = ( pNow(2) + pNow(6) ) / 2;
-        pNow(3) = ( pNow(3) + pNow(7) ) / 2;
-        pNow(4) = ( pNow(4) + pNow(8) ) / 2;
-        pNow(5) = pNow(1);
-        pNow(6) = pNow(2);
-        pNow(7) = pNow(3);
-        pNow(8) = pNow(4);
-
+        [pNow] = Pressure( pNow );
     end
 
 end

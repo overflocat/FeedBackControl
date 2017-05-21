@@ -1,5 +1,5 @@
-function feedback_3d_for_5_seg
-
+function Main
+    
     delete(instrfind);
     global s;
     s = serial('COM3', 'baudrate', 9600);
@@ -15,15 +15,11 @@ function feedback_3d_for_5_seg
     [point_num, ~] = size(goal);
 
     p_now=zeros(1,16);
-    mcs_initialize();
     pressure_for_16_05s(p_now);
+
+    mcs_initialize();
     for i = 1:point_num
         [p_now,k_p] = goto_goal_3d_5seg( goal(i,:), time, p_now,k_p);
-        p_now(15)=2000;
-        pause;
-        pressure_for_16_05s(p_now);
-%         [p_now] = FeedBackControl3D( p_now, goal(i,:), time );
-%         pause(4);
     end
 
     mcs_clear();
