@@ -27,25 +27,25 @@ function [p_now,k_p]=goto_goal_3d_5seg(goal,time,p_now,k_p)
     
         %Get a picture
         if i==1
-            [body1, body2] = mcs_date_2_body();
+            [body1, body2, body3, body4, body5, body6] = GetBodyFromMCS();
             %zhu yi IP
-            [stateone] = deal_data_from_mcs_2body( body1,body2)
+            [stateone] = ComputeState( body1, body2, body3, body4, body5, body6 );
             state_list=[state_list;stateone];
         end
-        X_error = x_dest-stateone(1)  ;
-        Y_error =  y_dest-stateone(2) ;
-        Z_error= z_dest-stateone(3);
-        ph_error = ph_dest-stateone(4)  ;
-        theta_error=theta_dest-stateone(5);
+        X_error = x_dest-stateone(5, 1)  ;
+        Y_error =  y_dest-stateone(5, 2) ;
+        Z_error= z_dest-stateone(5, 3);
+        ph_error = ph_dest-stateone(5, 4)  ;
+        theta_error=theta_dest-stateone(5, 5);
 
         %Record the current Coordinate of the arm's tail
-        ptail_now = stateone;
+        ptail_now = stateone(5, :);
 
         %Use the current X and Y to set the coordinate system for describing the change tendency of the arm
         [UXvectorDis,UvectorX] = SetCoordinateS_simple(ptail_now(1),ptail_now(3));
         [UYvectorDis,UvectorY] = SetCoordinateS_simple(ptail_now(2),ptail_now(3));
 
-        ptail_old=ptail_now;
+        ptail_old = ptail_now;
         p_old = p_now;
 
         %Virtual iteration
@@ -70,8 +70,8 @@ function [p_now,k_p]=goto_goal_3d_5seg(goal,time,p_now,k_p)
             yz_ddisdest=vydis'*vyz_dest*0.5;
             yz_dthetadest=theta_dest-ptail_virtual(5);
             
-            p_change_xz=AdjustPressure_for5seg_XZ(xz_dphdest, xz_ddisdest, xz_dxdest, k_dpdph, k_dpddis, k_dpdx, p_now);
-            p_change_yz=AdjustPressure_for5seg_YZ(yz_dthetadest, yz_ddisdest, yz_dydest, k_dpdtheta, k_dpddis, k_dpdy, p_now);
+            p_change_xz=AdjustPressure_for5seg_XZ(xz_dphdest, xz_ddisdest, xz_dxdest, k_dpdph, k_dpddis, k_dpdx, p_now, stateone);
+            p_change_yz=AdjustPressure_for5seg_YZ(yz_dthetadest, yz_ddisdest, yz_dydest, k_dpdtheta, k_dpddis, k_dpdy, p_now, stateone);
             
 
             %Use the change of p to calculate change of x, ph, and dis
@@ -84,7 +84,8 @@ function [p_now,k_p]=goto_goal_3d_5seg(goal,time,p_now,k_p)
             yz_dis=sum(p_change)*k_dpddis*0.5;
             yz_y=(4*(p_change(2)+p_change(1)-p_change(4)-p_change(3))+ 5*(p_change(6)+p_change(5)-p_change(8)-p_change(7)) + 7*(p_change(10)+p_change(9)-p_change(12)-p_change(11)) + 18*(p_change(13)-p_change(14)) )*k_dpdy;
             yz_theta=(2*(p_change(2)+p_change(1)-p_change(4)-p_change(3))+ 1*(p_change(6)+p_change(5)-p_change(8)-p_change(7)) + 1*(p_change(10)+p_change(9)-p_change(12)-p_change(11)) + 2*(p_change(13)-p_change(14)) )*k_dpdtheta;
-
+            %д����׸��
+            %dis����Ӧ�û�һ�ִ���ʽ
             ptail_virtual(1)=ptail_virtual(1)+vxdis(1)*xz_dis*2+vx(1)*xz_x;
             ptail_virtual(3)=ptail_virtual(3)+vxdis(2)*xz_dis+vx(2)*xz_x;
             ptail_virtual(4)=ptail_virtual(4)+xz_ph;
@@ -119,13 +120,12 @@ function [p_now,k_p]=goto_goal_3d_5seg(goal,time,p_now,k_p)
         pressure_for_16_05s(p_now);
         
         
-        [body1, body2] = mcs_date_2_body();
-        
-        [stateone] = deal_data_from_mcs_2body( body1,body2)
+        [body1, body2, body3, body4, body5, body6] = GetBodyFromMCS();
+        [stateone] = ComputeState( body1, body2, body3, body4, body5, body6 );
         state_list=[state_list;stateone];
 
         %Record the current Coordinate of the arm's tail
-        ptail_now = stateone;
+        ptail_now = stateone(5, :);
         
         %Calculate the real change of x, dis and ph
         tail_change = ptail_now - ptail_old;

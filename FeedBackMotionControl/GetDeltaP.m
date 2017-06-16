@@ -12,12 +12,14 @@ function [deltaPinR, deltaPinDis] = GetDeltaP( motion_source, motion_next, k_R, 
     deltaR_temp = deltaR;
     deltaDis_temp = deltaDis;
 
+    %Adjust the motion of arm from root to tip
 	for i = 1:SEGNUM
 
         if ( deltaR_temp(i) * deltaR(i) < 0 )
             deltaR_temp(i) = k_correct * deltaR(i);
         end
         
+        %Firstly, let the position of segment i reachs the position
         J = get_jacobian( motion_source, i, i, k_R, k_Dis );
         delta_p = J^-1 * [deltaDis_temp(i); deltaR_temp(i)];
         deltaPinDis(i) = delta_p(1);
@@ -28,8 +30,9 @@ function [deltaPinR, deltaPinDis] = GetDeltaP( motion_source, motion_next, k_R, 
         min_p = MAXP - max( [pNow(4*i-3) pNow(4*i-2) pNow(4*i-1) pNow(4*i)] );
         deltaPinDis(i) = min( deltaPinDis(i), min_p );
         
+        %Due to the distribution of valves, the last segment( segment near the root ) can not bend
         deltaPinR(1) = 0;
-        
+        %Then add the influence of the adjustment to the rest segments and change deltaR&Dis
         for j = i+1:SEGNUM
             J = get_jacobian( motion_source, i, j, k_R, k_Dis );
             delta_location = J * delta_p;
@@ -39,6 +42,8 @@ function [deltaPinR, deltaPinDis] = GetDeltaP( motion_source, motion_next, k_R, 
 
     end
 
+    %I don't know the reason why there are two statments
+    %Please ask Mr.Jin, leave it alone or just remove it
     deltaPinR = 0.9 * deltaPinR;
     deltaPinDis = 0.9 * deltaPinDis;
 

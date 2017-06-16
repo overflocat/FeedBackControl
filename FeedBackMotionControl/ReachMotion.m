@@ -46,9 +46,11 @@ function [pNow, K] = ReachMotion( motionGoal, TIMES, pNow, K, ERRORRANGE )
             break;
         end
 
+        %Compute the change in Pressure
         [deltaPinX, deltaPinDisX] = GetDeltaPX( currentState(:,1:2:3), motionGoal(:,1:2:3) ,k_X, k_disX, pNow );
         [deltaPinY, deltaPinDisY] = GetDeltaPY( currentState(:,2:1:3), motionGoal(:,2:1:3) ,k_Y, k_disY, pNow );
         
+        %Due to the formation of function get_jacobian, the result of deltaP should be flipped up
         deltaPinX = flipud( deltaPinX );
         deltaPinY = flipud( deltaPinY );
         deltaPinDisX = flipud( deltaPinDisX );
@@ -59,6 +61,7 @@ function [pNow, K] = ReachMotion( motionGoal, TIMES, pNow, K, ERRORRANGE )
             deltaPinDisY';
         end
 
+        %Accumulate deltaP( in Plane X and Plane Y )
         deltaP = zeros( 1, 4*SEGNUM );
         for j = 1:SEGNUM
             deltaP(j*4-3) = -deltaPinX(j) + deltaPinY(j);

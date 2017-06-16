@@ -17,7 +17,5 @@ function Test(  )
     b = currentState_2(5,3) - currentState_2(4,3)
     
     b / a
-    
-    
 end
 
